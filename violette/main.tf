@@ -8,7 +8,7 @@ resource "docker_container" "nginx" {
   image = "nginx:latest"  # Utiliser l'image officielle de NGINX
   ports {
     internal = 80
-    external = 8081  # Port externe sur ta machine locale
+    external = 8080  # Port externe sur ta machine locale
   }
 
   networks_advanced {

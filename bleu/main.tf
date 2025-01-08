@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -75,6 +71,13 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+resource "aws_eip" "web_eip" {
+  instance = aws_instance.web_instance.id
+  tags = {
+    Name = "web-eip"
+  }
+}
+
 resource "aws_instance" "web_instance" {
   ami           = "ami-0c02fb55956c7d316" # Amazon Linux 2 AMI ID for us-east-1
   instance_type = "t2.micro"
@@ -89,7 +92,7 @@ resource "aws_instance" "web_instance" {
               yum install -y httpd
               systemctl start httpd
               systemctl enable httpd
-              echo "<h1>Coucou ESGI :-)</h1>" > /var/www/html/index.html
+              echo "<h1>Welcome to your EC2 instance running Apache!</h1>" > /var/www/html/index.html
               EOF
 
   tags = {
