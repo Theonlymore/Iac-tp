@@ -1,10 +1,6 @@
-aws ec2 describe-images --owners amazon
 aws ec2 describe-images --filters "Name=name,Values=debian*"
 
-
-
 aws ec2 describe-vpcs
-
 
 aws ec2 describe-security-groups
 
@@ -24,3 +20,12 @@ aws ec2 run-instances \
 
 
 aws ec2 describe-instances --instance-ids i-0a1bde7095a516b8a 
+chmod 600 alex.pem
+ssh -i alex.pem admin@3.235.129.186
+
+
+aws ec2 stop-instances --instance-ids i-0a1bde7095a516b8a
+aws ec2 delete-key-pair --key-name alex
+
+
+
