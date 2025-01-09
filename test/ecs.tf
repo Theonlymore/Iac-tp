@@ -5,44 +5,64 @@ resource "aws_ecs_cluster" "main" {
 
 # Task Definition
 resource "aws_ecs_task_definition" "web" {
-  family                   = "web-app"
-  network_mode             = "awsvpc"
+  family                   = "wordpress-app"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 256
-  memory                   = 512
+  network_mode            = "awsvpc"
+  cpu                     = 1024
+  memory                  = 2048
 
   container_definitions = jsonencode([
     {
-      name      = "web-app"
-      image     = "nginx:latest"
+      name      = "wordpress"
+      image     = "wordpress:latest"
       essential = true
+      
+      environment = [
+        {
+          name  = "WORDPRESS_DB_HOST"
+          value = aws_db_instance.mysql.endpoint
+        },
+        {
+          name  = "WORDPRESS_DB_USER"
+          value = aws_db_instance.mysql.username
+        },
+        {
+          name  = "WORDPRESS_DB_PASSWORD"
+          value = aws_db_instance.mysql.password
+        },
+        {
+          name  = "WORDPRESS_DB_NAME"
+          value = aws_db_instance.mysql.db_name
+        }
+      ]
+
       portMappings = [
         {
           containerPort = 80
           protocol      = "tcp"
         }
       ]
+
     }
   ])
 }
 
 # Service ECS
 resource "aws_ecs_service" "web_service" {
-  name            = "web-service"
+  name            = "wordpress-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.web.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
-    security_groups  = [aws_security_group.web_sg.id]
-    assign_public_ip = false
+    subnets         = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    security_groups = [aws_security_group.ecs_tasks.id]
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.web_tg.arn
-    container_name   = "web-app"
+    container_name   = "wordpress"
     container_port   = 80
   }
 }
