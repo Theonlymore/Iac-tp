@@ -1,6 +1,9 @@
 const express = require('express');
-const mysql = require('mysql2');
 const cors = require('cors');
+const createProductsRouter = require('./createProducts');
+const buyProductsRouter = require('./buyProducts');
+const getProductsRouter = require('./getProducts');
+const db = require('./db');
 
 const app = express();
 const port = 3001;
@@ -8,47 +11,28 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Database connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'rootpassword',
-    database: 'testdb'
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL:', err);
-        return;
+// Initialize the products table if it doesn't exist
+db.query(
+    `CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10, 2) NOT NULL,
+        picture VARCHAR(255) NOT NULL
+    )`,
+    (err) => {
+        if (err) {
+            console.error('Error creating table:', err);
+        } else {
+            console.log('Products table initialized');
+        }
     }
-    console.log('Connected to MySQL');
-});
+);
 
-// API endpoints
-app.post('/add', (req, res) => {
-    const { name } = req.body;
-    const sql = 'INSERT INTO test_table (name) VALUES (?)';
-    db.query(sql, [name], (err, result) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Database error');
-        } else {
-            res.send('Data added successfully');
-        }
-    });
-});
-
-app.get('/get', (req, res) => {
-    const sql = 'SELECT * FROM test_table';
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Database error');
-        } else {
-            res.json(results);
-        }
-    });
-});
+// Use the routes
+app.use('/', createProductsRouter);
+app.use('/', buyProductsRouter);
+app.use('/', getProductsRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
