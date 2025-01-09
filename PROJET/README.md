@@ -1,7 +1,7 @@
 # Iac-tp
 
-Les challenges c'est ici
+Projets (challenge A)
 
-Pierre L
-Aurélien
-Alexandre
+FRONT : npm install ; npm start
+BACK : node index.jsdocker-compose up -d
+BDD : docker-compose up -d

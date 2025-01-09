@@ -1,16 +1,16 @@
 # Node.js
-/node_modules
-/npm-debug.log*
-/yarn-debug.log*
-/yarn-error.log*
-/dist
+*node_modules
+*npm-debug.log*
+*yarn-debug.log*
+*yarn-error.log*
+*dist
 
 # React
-build/
+*build*
 *.env
 .env.*
-/.vscode
-.DS_Store
+*.vscode
+*.DS_Store
 
 # Logs
 logs
