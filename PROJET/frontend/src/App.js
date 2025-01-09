@@ -1,65 +1,23 @@
-import React, { useState, useEffect } from 'react';
+// App.js
+import React from 'react';
 import './App.css';
-import { getProducts, createProduct, buyProduct } from './service';
-import ProductList from './ProductList';
+import useProducts from './hooks/useProducts';  // Correct path
+import ProductList from './components/ProductList';
 
 function App() {
-  const [products, setProducts] = useState([]);
-
-  // Fetch the list of products on component mount and periodically
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const productsData = await getProducts();
-        setProducts(productsData);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-    // Initial fetch
-    fetchProducts();
-
-    // Polling to fetch updates every second
-    const intervalId = setInterval(fetchProducts, 1000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
-
-  // Create a random product
-  const createRandomProduct = async () => {
-    const randomProduct = {
-      name: `Product ${Math.floor(Math.random() * 1000)}`,
-      description: 'This is a random product description.',
-      price: (Math.random() * 100).toFixed(2),
-      picture: `https://picsum.photos/200/300?random=${Math.floor(Math.random() * 1000)}`
-    };
-
-    try {
-      await createProduct(randomProduct);
-      setProducts((prevProducts) => [...prevProducts, randomProduct]);
-    } catch (error) {
-      console.error('Error creating product:', error);
-    }
-  };
-
-  // Buy a product
-  const handleBuyProduct = async (productId) => {
-    try {
-      await buyProduct(productId);
-      setProducts((prevProducts) => prevProducts.filter(product => product.id !== productId));
-      alert('Product bought successfully!');
-    } catch (error) {
-      console.error('Error buying product:', error);
-    }
-  };
+  const { products, createRandomProduct, handleBuyProduct } = useProducts();
 
   return (
     <div className="App">
-      <h1>Bienvenue</h1>
-      <button onClick={createRandomProduct}>Create Object</button>
-      <ProductList products={products} onBuyProduct={handleBuyProduct} />
+      <div className="hero">
+        <h1>Bienvenue sur Néo-Earth!</h1>
+        <p>Explorez notre site de vente de photos uniques de Néo-Earth, une planète lointaine semblable à la Terre. Découvrez des paysages spectaculaires et des souvenirs inoubliables, directement depuis l’espace!</p>
+      </div>
+
+      <div className="product-section">
+        <button className="create-button" onClick={createRandomProduct}>Créer un Objet</button>
+        <ProductList products={products} onBuyProduct={handleBuyProduct} />
+      </div>
     </div>
   );
 }
