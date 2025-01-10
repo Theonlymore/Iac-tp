@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: your-aws-endpoint
+      DB_USER: your-db-user
+      DB_PASSWORD: your-db-password
+      DB_NAME: your-db-name
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
