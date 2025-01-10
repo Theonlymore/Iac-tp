@@ -1,5 +1,5 @@
-# Frontend Dockerfile
-FROM node:18 AS build
+# Use the official Node.js 18 image
+FROM node:18
 
 # Set the working directory
 WORKDIR /app
@@ -10,20 +10,20 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the frontend code
+# Copy the rest of the application code
 COPY . .
 
-# Build the frontend for production
+# Build the app with environment variables
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build
 
-# Use an Nginx image to serve the static files
-FROM nginx:latest
+# Use an nginx server to serve the frontend
+FROM nginx:stable-alpine
+COPY --from=0 /app/build /usr/share/nginx/html
 
-# Copy built frontend files to Nginx's default HTML directory
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Expose port 80 for Nginx
+# Expose the port nginx will serve on
 EXPOSE 80
 
-# Start Nginx
+# Start the nginx server
 CMD ["nginx", "-g", "daemon off;"]

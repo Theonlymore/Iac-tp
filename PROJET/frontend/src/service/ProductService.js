@@ -1,7 +1,8 @@
 // service/ProductService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001';
+// Use environment variable or fallback to a default value
+const API_URL = process.env.REACT_APP_API_URL || "Incorrect-Host";
 
 // Function to get the list of products
 export const getProducts = async () => {
