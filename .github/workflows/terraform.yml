@@ -33,8 +33,9 @@ jobs:
     - name: Rentre dans le dossier bebou
       run: cd bleu
     
-    - name: ls
-      run: ls | pwd
+    - name: liste les fichiers
+      run: ls 
+    
     # Étape 4 : Initialiser Terraform
     - name: Terraform Init
       run: terraform init
