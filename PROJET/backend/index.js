@@ -7,9 +7,14 @@ const db = require('./db');
 
 const app = express();
 const port = 3001;
+const corsOptions = {
+    origin: '*',
+};
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
+
+
 
 // Initialize the products table if it doesn't exist
 db.query(
