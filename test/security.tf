@@ -1,8 +1,10 @@
+# Security Group pour l'Application Load Balancer (ALB)
 resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Allow HTTP and SSH traffic"
   vpc_id      = aws_vpc.main.id
 
+  # Permet l'accès HTTP depuis Internet
   ingress {
     from_port   = 80
     to_port     = 80
@@ -10,6 +12,7 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Permet l'accès SSH pour administration
   ingress {
     from_port   = 22
     to_port     = 22
@@ -17,6 +20,7 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Permet tout trafic sortant
   egress {
     from_port   = 0
     to_port     = 0
@@ -29,11 +33,20 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# Security Group pour les tâches ECS
+# Security Group pour les tâches ECS (Frontend et Backend)
 resource "aws_security_group" "ecs_tasks" {
   name        = "ecs-tasks-sg"
   vpc_id      = aws_vpc.main.id
 
+  # Permet la communication interne Frontend → Backend (port 3001)
+  ingress {
+    from_port       = 3001
+    to_port         = 3001
+    protocol        = "tcp"
+    self            = true  # Autorise la communication entre conteneurs du même security group
+  }
+
+  # Permet l'accès depuis l'ALB (port 80)
   ingress {
     from_port       = 80
     to_port         = 80
@@ -41,6 +54,7 @@ resource "aws_security_group" "ecs_tasks" {
     security_groups = [aws_security_group.web_sg.id]
   }
 
+  # Permet tout trafic sortant
   egress {
     from_port   = 0
     to_port     = 0
@@ -49,40 +63,12 @@ resource "aws_security_group" "ecs_tasks" {
   }
 }
 
-# Groupe de sécurité pour RDS
-resource "aws_security_group" "postgres" {
-  name        = "postgres-sg"
-  description = "Security group for PostgreSQL RDS"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_tasks.id]  # Permet l'accès depuis les tâches ECS
-  }
-
-  tags = {
-    Name = "postgres-sg"
-  }
-}
-
-# Mise à jour du groupe de sécurité des tâches ECS
-resource "aws_security_group_rule" "ecs_egress_postgres" {
-  type                     = "egress"
-  from_port               = 5432
-  to_port                 = 5432
-  protocol                = "tcp"
-  source_security_group_id = aws_security_group.postgres.id
-  security_group_id       = aws_security_group.ecs_tasks.id
-}
-
-# Mise à jour du groupe de sécurité pour MySQL
+# Security Group pour MySQL
 resource "aws_security_group" "mysql" {
   name        = "mysql-sg"
-  description = "Security group for MySQL RDS"
   vpc_id      = aws_vpc.main.id
 
+  # Permet l'accès MySQL depuis les tâches ECS (Backend)
   ingress {
     from_port       = 3306
     to_port         = 3306
@@ -90,17 +76,11 @@ resource "aws_security_group" "mysql" {
     security_groups = [aws_security_group.ecs_tasks.id]
   }
 
-  tags = {
-    Name = "mysql-sg"
+  # Permet tout trafic sortant
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-# Mise à jour de la règle pour ECS
-resource "aws_security_group_rule" "ecs_egress_mysql" {
-  type                     = "egress"
-  from_port               = 3306
-  to_port                 = 3306
-  protocol                = "tcp"
-  source_security_group_id = aws_security_group.mysql.id
-  security_group_id       = aws_security_group.ecs_tasks.id
 }
