@@ -5,7 +5,7 @@ resource "aws_ecs_cluster" "main" {
 
 # Task Definition
 resource "aws_ecs_task_definition" "web" {
-  family                   = "wordpress-app"
+  family                   = "web-app"
   requires_compatibilities = ["FARGATE"]
   network_mode            = "awsvpc"
   cpu                     = 1024
@@ -13,36 +13,16 @@ resource "aws_ecs_task_definition" "web" {
 
   container_definitions = jsonencode([
     {
-      name      = "wordpress"
-      image     = "wordpress:latest"
+      name      = "esgi-frontend"
+      image     = "onlymore/esgi-frontend:latest"
       essential = true
       
-      environment = [
-        {
-          name  = "WORDPRESS_DB_HOST"
-          value = aws_db_instance.mysql.endpoint
-        },
-        {
-          name  = "WORDPRESS_DB_USER"
-          value = aws_db_instance.mysql.username
-        },
-        {
-          name  = "WORDPRESS_DB_PASSWORD"
-          value = aws_db_instance.mysql.password
-        },
-        {
-          name  = "WORDPRESS_DB_NAME"
-          value = aws_db_instance.mysql.db_name
-        }
-      ]
-
       portMappings = [
         {
           containerPort = 80
           protocol      = "tcp"
         }
       ]
-
     }
   ])
 }
@@ -62,7 +42,7 @@ resource "aws_ecs_service" "web_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.web_tg.arn
-    container_name   = "wordpress"
+    container_name   = "esgi-frontend"
     container_port   = 80
   }
 }
