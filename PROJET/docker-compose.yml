@@ -7,10 +7,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+      DB_HOST: mysql-container
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_NAME: testdb
   frontend:
     build:
       context: ./frontend
