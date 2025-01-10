@@ -1,35 +1,42 @@
-name: Terraform Deploy
+name: Terraform Workflow
 
+# Déclencheur du workflow : ici, à chaque push sur la branche "main"
 on:
   push:
     branches:
       - main
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
 
     steps:
+    # Étape 1 : Télécharger le code depuis GitHub
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # Étape 2 : Configurer les credentials AWS depuis les secrets GitHub
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: your-region
+        aws-region: us-east-1
 
+    # Étape 3 : Installer Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.x.x
+        terraform_version: 1.5.0
 
+    # Étape 4 : Initialiser Terraform
     - name: Terraform Init
       run: terraform init
 
+    # Étape 5 : Planifier les modifications Terraform
     - name: Terraform Plan
       run: terraform plan
 
+    # Étape 6 : Appliquer les modifications Terraform
     - name: Terraform Apply
       run: terraform apply -auto-approve
