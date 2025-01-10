@@ -1,20 +1,20 @@
-# Use the official Node.js 18 image
-FROM node:18
+# Dockerfile for backend
+FROM node:16
 
-# Set the working directory inside the container
+# Install curl to download wait-for-it
+RUN apt-get update && apt-get install -y curl
+
+# Download wait-for-it script
+RUN curl -o /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && chmod +x /usr/local/bin/wait-for-it.sh
+
+# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy the project files
+COPY . .
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code to the container
-COPY . .
-
-# Expose the port your backend will run on
-EXPOSE 3000
-
-# Define the command to run the backend
-CMD ["node", "index.js"]
+# Start the application, waiting for MySQL to be ready
+CMD /usr/local/bin/wait-for-it.sh mysql-container:3306 -- npm start

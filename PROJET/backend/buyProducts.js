@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('./db'); // Import the database connection
+const db = require('./db');
 
 // Route to buy a product
 router.post('/buy-product', (req, res) => {
