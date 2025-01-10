@@ -1,0 +1,29 @@
+# Frontend Dockerfile
+FROM node:18 AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the frontend code
+COPY . .
+
+# Build the frontend for production
+RUN npm run build
+
+# Use an Nginx image to serve the static files
+FROM nginx:latest
+
+# Copy built frontend files to Nginx's default HTML directory
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose port 80 for Nginx
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
