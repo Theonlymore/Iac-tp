@@ -7,11 +7,13 @@ const db = require('./db');
 
 const app = express();
 const port = 3001;
+
 const corsOptions = {
-    origin: '*',
+    origin: '*', 
 };
 
 app.use(cors(corsOptions));
+
 app.use(express.json());
 
 
