@@ -1,6 +1,11 @@
 // hooks/useProducts.js
 import { useState, useEffect } from 'react';
-import { getProducts, createProduct, buyProduct } from '../service/ProductService';
+import {
+    getProducts,
+    createProduct,
+    buyProduct,
+    sendDiscordMessage
+} from '../service/ProductService';
 
 const useProducts = () => {
     const [products, setProducts] = useState([]);
@@ -8,8 +13,8 @@ const useProducts = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const productsData = await getProducts();
-                setProducts(productsData);
+                const data = await getProducts();
+                setProducts(data);
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
@@ -20,6 +25,7 @@ const useProducts = () => {
         return () => clearInterval(intervalId);
     }, []);
 
+    // 1) Create
     const createRandomProduct = async () => {
         const randomProduct = {
             name: `Product ${Math.floor(Math.random() * 1000)}`,
@@ -29,18 +35,26 @@ const useProducts = () => {
         };
 
         try {
+            // Create the product
             await createProduct(randomProduct);
-            setProducts((prevProducts) => [...prevProducts, randomProduct]);
+            setProducts((prev) => [...prev, randomProduct]);
+
+            // Send different message for create
+            await sendDiscordMessage(`Object created: ${randomProduct.name} (Price: $${randomProduct.price})`);
         } catch (error) {
             console.error('Error creating product:', error);
         }
     };
 
+    // 2) Buy
     const handleBuyProduct = async (productId) => {
         try {
+            // Buy the product
             await buyProduct(productId);
-            setProducts((prevProducts) => prevProducts.filter(product => product.id !== productId));
-            alert('Product bought successfully!');
+            setProducts((prev) => prev.filter((p) => p.id !== productId));
+
+            // Send different message for buy
+            await sendDiscordMessage(`Object bought: Product ID ${productId}`);
         } catch (error) {
             console.error('Error buying product:', error);
         }
