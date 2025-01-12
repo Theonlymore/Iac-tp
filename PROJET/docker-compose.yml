@@ -23,6 +23,8 @@ services:
       DB_USER: root
       DB_PASSWORD: rootpassword
       DB_NAME: testdb
+      DISCORD_WEBHOOK_ID: ${DISCORD_WEBHOOK_ID}
+      DISCORD_WEBHOOK_TOKEN: ${DISCORD_WEBHOOK_TOKEN}
     depends_on:
       - mysql-container
     command: /usr/local/bin/wait-for-it.sh mysql-container:3306 -- npm start
@@ -32,7 +34,7 @@ services:
     build:
       context: ./frontend
       args:
-        REACT_APP_API_URL: "http://localhost:3001"  
+        REACT_APP_API_URL: "http://localhost:3001"
     ports:
       - "3002:80"
     environment:
