@@ -15,7 +15,7 @@ services:
   backend:
     container_name: backend
     build:
-      context: ./backend
+      context: ./apps/backend
     ports:
       - "3001:3001"
     environment:
@@ -32,7 +32,7 @@ services:
   frontend:
     container_name: frontend
     build:
-      context: ./frontend
+      context: ./apps/frontend
       args:
         REACT_APP_API_URL: "http://localhost:3001"
     ports:

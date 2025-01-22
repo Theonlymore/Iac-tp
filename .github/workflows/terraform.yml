@@ -31,25 +31,27 @@ jobs:
         terraform_version: 1.5.0
 
     
-    - name: liste les fichiers
-      run: ls 
-      working-directory: bleu
+    # Étape 4 : Installer Docker
+    - name: Install Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
 
     
     # Étape 4 : Initialiser Terraform
     - name: Terraform Init
       run: terraform init
-      working-directory: bleu
+      working-directory: PROJET
 
 
     # Étape 5 : Planifier les modifications Terraform
     - name: Terraform Plan
       run: terraform plan
-      working-directory: bleu
+      working-directory: PROJET
 
 
     # Étape 6 : Appliquer les modifications Terraform
     - name: Terraform Apply
       run: terraform apply -auto-approve
-      working-directory: bleu
+      working-directory: PROJET
 
