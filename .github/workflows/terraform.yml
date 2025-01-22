@@ -21,28 +21,25 @@ jobs:
       with:
         terraform_version: 1.5.0
 
-    
-    # Étape 4 : Installer Docker
-    - name: Install Docker
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
+      # Étape 2 : Connexion à Docker (facultatif si un registre privé est utilisé)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: onlymore
+          password: dckr_pat_yG8eEkSOFak_jGT7j_cvZYDvkGk
 
-    
-    # Étape 4 : Initialiser Terraform
-    - name: Terraform Init
-      run: terraform init
-      working-directory: PROJET
+      - name: Build Docker Image
+        run: |
+          docker build -t onlymore/esgi-frontend:latest .
+        working-directory: PROJET/apps/frontend
 
+      - name: Push Docker Image
+        run:  docker push onlymore/esgi-frontend:latest
 
-    # Étape 5 : Planifier les modifications Terraform
-    - name: Terraform Plan
-      run: terraform plan
-      working-directory: PROJET
+      - name: Build Docker Image
+        run: |
+          docker build -t onlymore/esgi-backend:latest .
+        working-directory: PROJET/apps/backend
 
-
-    # Étape 6 : Appliquer les modifications Terraform
-    - name: Terraform Apply
-      run: terraform apply -auto-approve
-      working-directory: PROJET
-
+      - name: Push Docker Image
+        run:  docker push onlymore/esgi-backend:latest
