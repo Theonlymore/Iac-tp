@@ -98,9 +98,9 @@ resource "aws_security_group" "mysql" {
 # Mise à jour de la règle pour ECS
 resource "aws_security_group_rule" "ecs_egress_mysql" {
   type                     = "egress"
-  from_port               = 3306
-  to_port                 = 3306
-  protocol                = "tcp"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
   source_security_group_id = aws_security_group.mysql.id
-  security_group_id       = aws_security_group.ecs_tasks.id
+  security_group_id        = aws_security_group.ecs_tasks.id
 }

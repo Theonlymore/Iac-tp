@@ -13,14 +13,32 @@ resource "aws_ecs_task_definition" "web" {
 
   container_definitions = jsonencode([
     {
-      name      = "esgi-frontend"
-      image     = "onlymore/esgi-frontend:latest"
+      name      = "wordpress"
+      image     = "wordpress:latest"
       essential = true
       
       portMappings = [
         {
           containerPort = 80
           protocol      = "tcp"
+        }
+      ]
+     environment = [
+        {
+          name  = "WORDPRESS_DB_HOST"
+          value = "${aws_db_instance.mysql.endpoint}"
+        },
+        {
+          name  = "WORDPRESS_DB_USER"
+          value = "dbadmin"
+        },
+        {
+          name  = "WORDPRESS_DB_PASSWORD"
+          value = "esgi-complex-password"
+        },
+        {
+          name  = "WORDPRESS_DB_NAME"
+          value = "${aws_db_instance.mysql.db_name}"
         }
       ]
     }
@@ -42,7 +60,7 @@ resource "aws_ecs_service" "web_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.web_tg.arn
-    container_name   = "esgi-frontend"
+    container_name   = "wordpress"
     container_port   = 80
   }
 }
@@ -89,5 +107,3 @@ resource "aws_appautoscaling_policy" "ecs_policy_memory" {
     target_value = 80.0  # Déclenche l'auto-scaling quand l'utilisation mémoire atteint 80%
   }
 }
-
-

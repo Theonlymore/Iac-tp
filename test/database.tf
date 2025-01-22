@@ -8,9 +8,9 @@ resource "aws_db_instance" "mysql" {
   storage_type        = "gp2"
   port                = 3306
   
-  db_name             = "wordpress"
+  db_name             = "esgi"
   username            = "dbadmin"
-  password            = "votre_mot_de_passe_complexe"  # À remplacer par une variable ou un secret
+  password            = "esgi-complex-password"  
 
   db_subnet_group_name   = aws_db_subnet_group.postgres.name
   vpc_security_group_ids = [aws_security_group.mysql.id]
